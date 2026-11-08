@@ -4,9 +4,6 @@
 #include "PythonAPI/BlueprintTypeParser.h"
 #include "Engine/CollisionProfile.h"     // Custom collision channel names (set_collision_settings)
 #include "PythonAPI/BlueprintClassResolve.h" // Short-name ambiguity policy (VibeBlueprintClassResolve)
-
-// MoonCatalyst changes to this file; each one keeps the vendor's code in its #else.
-#define MOONCATALYST_VIBEUE_PRIVATE_FROM_METADATA 1
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/Level.h"                // Level Blueprint resolution (LoadBlueprint on a map path)
@@ -2895,14 +2892,7 @@ bool UBlueprintService::GetVariableInfo(
 			// Property flags
 			OutInfo.bIsInstanceEditable = (VarDesc.PropertyFlags & CPF_DisableEditOnInstance) == 0;
 			OutInfo.bIsExposeOnSpawn = (VarDesc.PropertyFlags & CPF_ExposeOnSpawn) != 0;
-#if MOONCATALYST_VIBEUE_PRIVATE_FROM_METADATA
-			// My Blueprint's Private checkbox writes the BlueprintPrivate metadata (BlueprintDetailsCustomization.cpp).
-			// bIsConst is the pin type's const flag, false on every member variable, so is_private read False for a
-			// variable ticked Private (BP_PlayerBase r436, 2026-10-26).
 			OutInfo.bIsPrivate = VarDesc.HasMetaData(FBlueprintMetadata::MD_Private) && VarDesc.GetMetaData(FBlueprintMetadata::MD_Private).Equals(TEXT("true"), ESearchCase::IgnoreCase);
-#else
-			OutInfo.bIsPrivate = VarDesc.VarType.bIsConst;
-#endif
 			OutInfo.bIsBlueprintReadOnly = (VarDesc.PropertyFlags & CPF_BlueprintReadOnly) != 0;
 			OutInfo.bIsExposeToCinematics = (VarDesc.PropertyFlags & CPF_Interp) != 0;
 
